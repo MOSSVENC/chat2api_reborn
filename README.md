@@ -1,5 +1,15 @@
 # DeepSeek Proxy
 
+> **⚠️ 此仓库的旧 token 已失效，请勿再用它测试**  
+> **⚠️ The old token in this repo has been revoked. Do NOT use it for testing.**
+>
+> ![no](no.png)
+>
+> **🔑 如需测试，请登录自己的 DeepSeek 账号，按 F12 打开浏览器开发工具查找你的 Bearer Token**  
+> **🔑 To test, log into your own DeepSeek account, press F12, and find your Bearer Token in DevTools.**
+>
+> ![yes](yes.png)
+
 DeepSeek 网页 API 反代，提供 OpenAI 兼容端点，可直接替代 OpenAI API base URL 使用。
 
 无需 Electron，纯 Python 实现，支持 DeepSeek-V3.2（对话）和 DeepSeek-R1（推理）模型。
