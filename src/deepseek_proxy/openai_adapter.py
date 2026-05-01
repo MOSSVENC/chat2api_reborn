@@ -26,16 +26,20 @@ class OpenAIAdapter:
         model_lower = model.lower()
 
         # 精确匹配
-        if model_lower in ("deepseek-chat", "deepseek-v3", "deepseek-v3.2", "default"):
+        if model_lower in ("deepseek-v4-flash", "deepseek-v3", "deepseek-v3.2", "default"):
             return "default", False, False
-        if model_lower in ("deepseek-reasoner", "deepseek-r1", "expert"):
-            return "expert", True, False
-        if "search" in model_lower and ("r1" in model_lower or "reasoner" in model_lower or "expert" in model_lower):
-            return "expert", True, True
+        if model_lower == "deepseek-v4-pro":
+            return "default", True, True
+        # deepseek-chat — 将于 2026/07/24 弃用，请迁移至 deepseek-v4-flash
+        if model_lower == "deepseek-chat":
+            return "default", False, False
+        # deepseek-reasoner — 将于 2026/07/24 弃用，实际等同于 deepseek-v4-flash 的思考模式
+        if model_lower == "deepseek-reasoner":
+            return "default", True, False
         if "search" in model_lower:
             return "default", False, True
-        if "think" in model_lower or "r1" in model_lower or "reasoner" in model_lower:
-            return "expert", True, False
+        if "think" in model_lower or "reasoner" in model_lower or "r1" in model_lower:
+            return "default", True, False
 
         # 默认
         return "default", False, False
@@ -64,7 +68,7 @@ class OpenAIAdapter:
     async def chat(
         self,
         messages: list[dict],
-        model: str = "deepseek-chat",
+        model: str = "deepseek-v4-flash",
         stream: bool = True,
         tools: Optional[list[dict]] = None,
         tool_choice: Any = None,

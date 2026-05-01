@@ -18,34 +18,24 @@ class SessionMode(str, Enum):
 
 
 class DeepSeekModel(str, Enum):
-    DEFAULT = "default"          # DeepSeek-V3.2
-    EXPERT = "expert"            # DeepSeek-R1
-    DEFAULT_SEARCH = "default_search"   # V3.2 + 搜索
-    EXPERT_SEARCH = "expert_search"     # R1 + 搜索
-    DEFAULT_THINK = "default_think"     # V3.2 + 深度思考
-    EXPERT_THINK = "expert_think"       # R1 + 深度思考
+    DEFAULT = "default"                # deepseek-v4-flash（非思考模式）
+    DEFAULT_SEARCH = "default_search"  # deepseek-v4-flash + 搜索
 
     @property
     def model_type(self) -> str:
-        """映射到 DeepSeek API 的 model_type 字段"""
-        mapping = {
-            DeepSeekModel.DEFAULT: "default",
-            DeepSeekModel.EXPERT: "expert",
-            DeepSeekModel.DEFAULT_SEARCH: "default",
-            DeepSeekModel.EXPERT_SEARCH: "expert",
-            DeepSeekModel.DEFAULT_THINK: "default",
-            DeepSeekModel.EXPERT_THINK: "expert",
-        }
-        return mapping[self]
+        """映射到 DeepSeek API 的 model_type 字段。
+        所有 v4 模型统一使用 'default'，思考模式通过请求参数独立控制。
+        """
+        return "default"
 
     @property
     def thinking_enabled(self) -> bool:
-        return self in (DeepSeekModel.DEFAULT_THINK, DeepSeekModel.EXPERT_THINK,
-                        DeepSeekModel.EXPERT, DeepSeekModel.EXPERT_SEARCH)
+        """思考模式由请求参数控制，不再依赖枚举值。"""
+        return False
 
     @property
     def search_enabled(self) -> bool:
-        return self in (DeepSeekModel.DEFAULT_SEARCH, DeepSeekModel.EXPERT_SEARCH)
+        return self is DeepSeekModel.DEFAULT_SEARCH
 
 
 @dataclass
@@ -87,7 +77,7 @@ class ProxyConfig:
 
     # === 模型 ===
     default_model: DeepSeekModel = DeepSeekModel.DEFAULT
-    model_types: list[str] = field(default_factory=lambda: ["default", "expert"])
+    model_types: list[str] = field(default_factory=lambda: ["default"])
 
     # === 超时 (秒) ===
     http_timeout: float = 120.0

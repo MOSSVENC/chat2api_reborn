@@ -12,18 +12,18 @@
 
 DeepSeek 网页 API 反代，提供 OpenAI 兼容端点，可直接替代 OpenAI API base URL 使用。
 
-无需 Electron，纯 Python 实现，支持 DeepSeek-V3.2（对话）和 DeepSeek-R1（推理）模型。
+无需 Electron，纯 Python 实现，支持 DeepSeek-V4-Flash（快速对话）和 DeepSeek-V4-Pro（深度推理）模型。
 
 ---
 
 ## 功能特性
 
 - **OpenAI 兼容接口** — 适配 `/v1/chat/completions`、`/v1/models`、`/health`
-- **双模型支持** — DeepSeek-V3.2（`deepseek-chat` / `deepseek-v3`）和 DeepSeek-R1（`deepseek-reasoner` / `deepseek-r1`）
+- **双模型支持** — DeepSeek-V4-Flash（`deepseek-v4-flash`）和 DeepSeek-V4-Pro（`deepseek-v4-pro`）
 - **双认证通道** — Password（邮箱/手机号 + 密码自动登录）或 Bearer Token
 - **双会话策略** — REUSE（初始化创建 session 永久复用）或 NEW（每次请求新建 session）
 - **PoW 反爬** — 自动下载 WASM 模块并求解工作量证明
-- **流式响应** — Server-Sent Events 流式输出，支持 `reasoning_content`（R1 推理过程）
+- **流式响应** — Server-Sent Events 流式输出，支持 `reasoning_content`（V4-Pro 推理过程）
 - **CORS 支持** — 跨域请求开箱即用
 
 ---
@@ -58,18 +58,18 @@ client = OpenAI(
     base_url="http://127.0.0.1:5317/v1"  # 指向本服务
 )
 
-# DeepSeek-V3.2 对话
+# DeepSeek-V4-Flash 快速对话（默认）
 stream = client.chat.completions.create(
-    model="deepseek-chat",
+    model="deepseek-v4-flash",
     messages=[{"role": "user", "content": "Hello"}],
     stream=True
 )
 for chunk in stream:
     print(chunk.choices[0].delta.content, end="")
 
-# DeepSeek-R1 推理（输出包含 reasoning_content）
+# DeepSeek-V4-Pro 深度推理（输出包含 reasoning_content）
 stream = client.chat.completions.create(
-    model="deepseek-reasoner",
+    model="deepseek-v4-pro",
     messages=[{"role": "user", "content": "Why is the sky blue?"}],
     stream=True
 )
@@ -80,7 +80,7 @@ curl 示例:
 ```bash
 curl -X POST http://127.0.0.1:5317/v1/chat/completions \
   -H "Content-Type: application/json" \
-  -d '{"model":"deepseek-chat","messages":[{"role":"user","content":"Say hi"}],"max_tokens":50}'
+  -d '{"model":"deepseek-v4-flash","messages":[{"role":"user","content":"Say hi"}],"max_tokens":50}'
 ```
 
 ---
@@ -177,12 +177,12 @@ src/deepseek_proxy/
 
 ## 模型映射
 
-| OpenAI 模型名 | DeepSeek 模型 | 类型 |
-|--------------|--------------|------|
-| `deepseek-chat` | `default` | V3.2 对话 |
-| `deepseek-v3` | `default` | V3.2（别名）|
-| `deepseek-reasoner` | `expert` | R1 推理 |
-| `deepseek-r1` | `expert` | R1（别名）|
+| OpenAI 模型名 | 模型 | 类型 | 备注 |
+|--------------|------|------|------|
+| `deepseek-v4-flash` | DeepSeek-V4-Flash | 快速对话（默认） | 替代 `deepseek-chat` |
+| `deepseek-v4-pro` | DeepSeek-V4-Pro | 深度推理（默认开启思考） | 替代 `deepseek-reasoner` |
+| `deepseek-chat` | DeepSeek-V4-Flash | 快速对话 | **将于 2026/07/24 弃用**，迁移至 `deepseek-v4-flash` |
+| `deepseek-reasoner` | DeepSeek-V4-Flash | 思考模式 | **将于 2026/07/24 弃用**，迁移至 `deepseek-v4-pro` |
 
 ---
 

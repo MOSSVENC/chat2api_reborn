@@ -148,15 +148,19 @@ def create_app(config: ProxyConfig) -> FastAPI:
     async def list_models():
         """返回可用模型列表"""
         models = [
+            # 新默认模型 — DeepSeek-V4 Flash (快速, 替代 deepseek-chat)
+            {"id": "deepseek-v4-flash", "object": "model", "owned_by": "deepseek"},
+            # 思考模型 — DeepSeek-V4 Pro (深度推理, 替代 deepseek-reasoner)
+            {"id": "deepseek-v4-pro", "object": "model", "owned_by": "deepseek"},
+            # 向后兼容 — 映射到 deepseek-v4-flash (DeepSeek-V3.2, 即将弃用)
             {"id": "deepseek-chat", "object": "model", "owned_by": "deepseek"},
+            # 向后兼容 — 映射到 deepseek-v4-pro (DeepSeek-R1, 即将弃用)
             {"id": "deepseek-reasoner", "object": "model", "owned_by": "deepseek"},
         ]
-        # 根据配置添加搜索/思考变体
-        for mt in _app_state.config.model_types if _app_state else ["default", "expert"]:
-            if mt == "expert":
-                models.append({"id": "deepseek-r1", "object": "model", "owned_by": "deepseek"})
+        # 根据配置添加旧模型变体 (向后兼容)
+        for mt in _app_state.config.model_types if _app_state else ["default"]:
             if mt == "default":
-                models.append({"id": "deepseek-v3", "object": "model", "owned_by": "deepseek"})
+                models.append({"id": "deepseek-v4-flash", "object": "model", "owned_by": "deepseek"})
 
         return {"object": "list", "data": models}
 
