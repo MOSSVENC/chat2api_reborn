@@ -123,6 +123,8 @@ CONFIG = ProxyConfig(
  # Bearer Token (auth_mode=token 时使用)
  user_token="1TR1JHiK3s20p9PQslvGsXn9skWljioxUhKBqTP4FQhmG+cmRMYWiTmmo2sReb1N",
 
+ # 此token已作废，已畏惧，不要再用我的token了
+ # I'm scared. Don't use up my tokens! This token has been revoked.
     # 会话策略
     session_mode=SessionMode.REUSE,
 
